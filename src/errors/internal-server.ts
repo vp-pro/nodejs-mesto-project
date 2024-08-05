@@ -1,4 +1,4 @@
-export class InternalServer extends Error {
+export default class InternalServer extends Error {
   public statusCode: number;
 
   constructor(message: string) {
