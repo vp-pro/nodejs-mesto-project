@@ -1,9 +1,12 @@
 import { Router } from 'express';
+import { celebrate, Joi } from 'celebrate';
+
+import { PATTERN_LINK } from '../constants';
 
 import {
   getAllUsers,
+  getUserMe,
   getUserById,
-  createUser,
   updateUser,
   updateUserAvatar,
 } from '../controllers/users';
@@ -11,9 +14,22 @@ import {
 const router = Router();
 
 router.get('/', getAllUsers);
-router.get('/:userId', getUserById);
-router.post('/', createUser);
-router.patch('/me', updateUser);
-router.patch('/me/avatar', updateUserAvatar);
+router.get('/me', getUserMe);
+router.get('/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().required().hex().length(24),
+  }),
+}), getUserById);
+router.patch('/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateUser);
+router.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().pattern(PATTERN_LINK),
+  }),
+}), updateUserAvatar);
 
 export default router;
