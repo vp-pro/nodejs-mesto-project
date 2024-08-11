@@ -7,7 +7,8 @@ import Unauthorized from '../errors/unauthorized-error';
 const auth = (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new Unauthorized('Необходима авторизация.'));
+    next(new Unauthorized('Необходима авторизация.'));
+    return;
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -16,7 +17,8 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
-    return next(new Unauthorized('Необходима авторизация.'));
+    next(new Unauthorized('Необходима авторизация.'));
+    return;
   }
 
   req.user = payload as { _id: ObjectId };
